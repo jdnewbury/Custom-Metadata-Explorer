@@ -3,39 +3,35 @@
     <label>Default</label>
     <protected>false</protected>
     <values>
-        <field>Workspace__c</field>
-        <value xsi:type="xsd:string">your-workspace-slug</value>
+        <field>API_Base_URL__c</field>
+        <value xsi:type="xsd:string">https://api.bitbucket.org/2.0</value>
     </values>
     <values>
-        <field>Repository__c</field>
-        <value xsi:type="xsd:string">your-repository-slug</value>
-    </values>
-    <values>
-        <field>Branch__c</field>
-        <value xsi:type="xsd:string">main</value>
+        <field>API_Token__c</field>
+        <value xsi:type="xsd:string">ATATT3xFfGF0BnTEKPSong9IBC5ZPxAEGpbiApGCRoMNBDiPpNwEx-pnYCZBMr5ADciTZ81Jlmuphsx0fxYSlsN-VGDXFQkixC2L4NRPZUdnQDeUg34Af6gaj1FnRaludAiYFiwiTog81tNWQzH0b36ZgvYVEBKu812CYgzkEt08ioszs2Ve2lk=C8D81317</value>
     </values>
     <values>
         <field>Base_Path__c</field>
         <value xsi:type="xsd:string">force-app/main/default</value>
     </values>
     <values>
+        <field>Branch__c</field>
+        <value xsi:type="xsd:string">main</value>
+    </values>
+    <values>
         <field>Email__c</field>
-        <!-- USE YOUR ATLASSIAN ACCOUNT EMAIL, NOT BITBUCKET USERNAME -->
         <value xsi:type="xsd:string">jason.newbury@tquilaanz.com</value>
     </values>
     <values>
-        <field>API_Token__c</field>
-        <!-- Create at: Atlassian account → Security → API tokens with scopes -->
-        <!-- Required scope: read:repository:bitbucket -->
-        <value xsi:type="xsd:string">ATATT3xFfGF0BnTEKPSong9IBC5ZPxAEGpbiApGCRoMNBDiPpNwEx-pnYCZBMr5ADciTZ81Jlmuphsx0fxYSlsN-VGDXFQkixC2L4NRPZUdnQDeUg34Af6gaj1FnRaludAiYFiwiTog81tNWQzH0b36ZgvYVEBKu812CYgzkEt08ioszs2Ve2lk=C8D81317</value>
-    </values>
-    <values>
-        <field>API_Base_URL__c</field>
-        <value xsi:type="xsd:string">https://api.bitbucket.org/2.0</value>
+        <field>Repository__c</field>
+        <value xsi:type="xsd:string">your-repository-slug</value>
     </values>
     <values>
         <field>Token_Expiry__c</field>
-        <!-- Set to your token's expiration date for tracking -->
         <value xsi:type="xsd:date">2026-01-01</value>
+    </values>
+    <values>
+        <field>Workspace__c</field>
+        <value xsi:type="xsd:string">your-workspace-slug</value>
     </values>
 </CustomMetadata>

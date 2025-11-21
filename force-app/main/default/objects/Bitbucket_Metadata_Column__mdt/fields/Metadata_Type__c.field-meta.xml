@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Metadata_Type__c</fullName>
-    <label>Metadata Type</label>
     <description>Parent metadata type this column belongs to</description>
-    <type>MetadataRelationship</type>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Metadata Type</label>
     <referenceTo>Bitbucket_Metadata_Type__mdt</referenceTo>
     <relationshipLabel>Columns</relationshipLabel>
     <relationshipName>Columns</relationshipName>
+    <required>false</required>
+    <type>MetadataRelationship</type>
+    <unique>false</unique>
 </CustomField>

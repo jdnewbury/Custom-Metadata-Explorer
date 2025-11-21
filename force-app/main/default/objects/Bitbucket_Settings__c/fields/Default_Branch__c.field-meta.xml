@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Default_Branch__c</fullName>
+    <defaultValue>&quot;main&quot;</defaultValue>
+    <description>The default branch name to use for API operations</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Enter the default branch name (e.g., main, master, develop)</inlineHelpText>
+    <label>Default Branch</label>
+    <length>50</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <RemoteSiteSetting xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Allows for metadata retrieval for use with the CustomMetadataExplorer App and LWC</description>
+    <description>Bitbucket repo</description>
     <disableProtocolSecurity>false</disableProtocolSecurity>
     <isActive>true</isActive>
-    <url>https://orgfarm-9bf0473e28-dev-ed.develop.lightning.force.com</url>
+    <url>https://api.bitbucket.org</url>
 </RemoteSiteSetting>

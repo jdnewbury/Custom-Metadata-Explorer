@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>API_Base_URL__c</fullName>
-    <label>API Base URL</label>
+    <defaultValue>&quot;https://api.bitbucket.org/2.0&quot;</defaultValue>
     <description>Bitbucket API base URL (typically https://api.bitbucket.org/2.0)</description>
-    <type>Text</type>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>API Base URL</label>
     <length>255</length>
     <required>false</required>
-    <defaultValue>"https://api.bitbucket.org/2.0"</defaultValue>
+    <type>Text</type>
+    <unique>false</unique>
 </CustomField>

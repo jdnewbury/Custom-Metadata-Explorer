@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Root_Element__c</fullName>
+    <description>XML root element name for parsing (e.g., &quot;assignmentRule&quot;, &quot;Workflow&quot;)</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
     <label>Root Element</label>
-    <description>XML root element name for parsing (e.g., "assignmentRule", "Workflow")</description>
-    <type>Text</type>
     <length>100</length>
     <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
 </CustomField>

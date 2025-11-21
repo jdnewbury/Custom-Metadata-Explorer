@@ -1,115 +1,129 @@
 <template>
-    <lightning-card title="Bitbucket Connection Tester" icon-name="custom:custom63">
-        <div class="slds-p-around_medium">
-            
-            <!-- Important Notice -->
-            <div class="slds-box slds-box_x-small slds-theme_warning slds-m-bottom_medium">
-                <div class="slds-grid slds-grid_vertical-align-center">
-                    <lightning-icon icon-name="utility:warning" variant="warning" size="small" class="slds-m-right_small"></lightning-icon>
-                    <div>
-                        <p class="slds-text-body_regular">
-                            <strong>Important:</strong> As of Sept 9, 2025, Bitbucket requires <strong>API Tokens with Scopes</strong>.
-                        </p>
-                        <p class="slds-text-body_small slds-m-top_xx-small">
-                            Use your <strong>Atlassian account email</strong> (not Bitbucket username) for authentication.
-                        </p>
-                    </div>
+    <lightning-card title="Bitbucket Connection Tester" icon-name="utility:connected_apps">
+        <div class="slds-p-horizontal_medium">
+            <!-- Error Message -->
+            <template if:true={hasError}>
+                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                    <span class="slds-assistive-text">error</span>
+                    <h2>{error}</h2>
                 </div>
+            </template>
+
+            <!-- Connection Status -->
+            <template if:true={connectionStatus}>
+                <div class="slds-box slds-theme_shade slds-m-bottom_medium">
+                    <p><strong>Connection Status:</strong> {connectionStatus}</p>
+                </div>
+            </template>
+
+            <!-- Action Buttons -->
+            <div class="slds-button-group slds-m-bottom_medium">
+                <lightning-button
+                    variant="brand"
+                    label="Test Connection"
+                    onclick={handleTestConnection}
+                    disabled={isLoading}>
+                </lightning-button>
+                <lightning-button
+                    variant="neutral"
+                    label="Get README"
+                    onclick={handleGetFile}
+                    disabled={isLoading}>
+                </lightning-button>
+                <lightning-button
+                    variant="neutral"
+                    label="List Contents"
+                    onclick={handleListContents}
+                    disabled={isLoading}>
+                </lightning-button>
+                <lightning-button
+                    variant="neutral"
+                    label="Get Branches"
+                    onclick={handleGetBranches}
+                    disabled={isLoading}>
+                </lightning-button>
+                <lightning-button
+                    variant="neutral"
+                    label="Get Commits"
+                    onclick={handleGetCommits}
+                    disabled={isLoading}>
+                </lightning-button>
+                <lightning-button
+                    variant="neutral"
+                    label="Get Pull Requests"
+                    onclick={handleGetPullRequests}
+                    disabled={isLoading}>
+                </lightning-button>
             </div>
 
-            <p class="slds-text-body_regular slds-m-bottom_medium">
-                Test your Bitbucket configuration to ensure Salesforce can connect to your repository.
-            </p>
-
-            <lightning-button
-                label="Test Connection"
-                variant="brand"
-                onclick={handleTestConnection}
-                disabled={isLoading}
-                class="slds-m-bottom_medium"
-            ></lightning-button>
-
+            <!-- Loading Spinner -->
             <template if:true={isLoading}>
-                <div class="slds-is-relative slds-m-top_medium" style="height: 50px;">
-                    <lightning-spinner alternative-text="Testing connection..." size="small"></lightning-spinner>
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </template>
+
+            <!-- File Content Display -->
+            <template if:true={hasFileContent}>
+                <div class="slds-box slds-m-top_medium">
+                    <h3 class="slds-text-heading_small slds-m-bottom_small">File Content:</h3>
+                    <pre class="slds-text-body_regular">{fileContent}</pre>
                 </div>
             </template>
 
-            <template if:true={showResult}>
-                <div class={resultClass}>
-                    <div class="slds-grid slds-grid_vertical-align-start">
-                        <lightning-icon
-                            icon-name={resultIcon}
-                            variant={resultVariant}
-                            size="small"
-                            class="slds-m-right_small"
-                            style="flex-shrink: 0;"
-                        ></lightning-icon>
-                        <div>
-                            <p class="slds-text-heading_small">
-                                <template if:true={testResult.success}>Connection Successful!</template>
-                                <template if:false={testResult.success}>Connection Failed</template>
-                            </p>
-                            <p class="slds-text-body_regular slds-m-top_x-small">{testResult.message}</p>
-                            <template if:true={testResult.repoName}>
-                                <p class="slds-text-body_small slds-m-top_x-small">
-                                    <strong>Repository:</strong> {testResult.repoName}
-                                </p>
-                            </template>
-                            <template if:true={hasAuthMethod}>
-                                <p class="slds-text-body_small slds-m-top_xx-small">
-                                    <strong>Auth Method:</strong> {testResult.authMethod}
-                                </p>
-                            </template>
-                        </div>
-                    </div>
+            <!-- Repository Contents Display -->
+            <template if:true={hasRepositoryContents}>
+                <div class="slds-box slds-m-top_medium">
+                    <h3 class="slds-text-heading_small slds-m-bottom_small">Repository Contents:</h3>
+                    <ul class="slds-list_dotted">
+                        <template for:each={repositoryContents} for:item="item">
+                            <li key={item.path} class="slds-p-around_xx-small">
+                                {item.path} ({item.type})
+                            </li>
+                        </template>
+                    </ul>
                 </div>
             </template>
 
-            <div class="slds-box slds-theme_shade slds-m-top_large">
-                <p class="slds-text-heading_small slds-m-bottom_small">Setup Checklist</p>
-                <ul class="slds-list_dotted">
-                    <li class="slds-m-bottom_x-small">
-                        <strong>Remote Site Setting</strong> created for <code>https://api.bitbucket.org</code>
-                    </li>
-                    <li class="slds-m-bottom_x-small">
-                        <strong>Bitbucket_Config__mdt</strong> Custom Metadata Type deployed
-                    </li>
-                    <li class="slds-m-bottom_x-small">
-                        <strong>API Token</strong> created with <code>read:repository:bitbucket</code> scope
-                        <ul class="slds-list_dotted slds-m-left_medium slds-m-top_xx-small">
-                            <li>Atlassian account → Security → API tokens</li>
-                            <li>Create API token with scopes → Select Bitbucket</li>
-                        </ul>
-                    </li>
-                    <li class="slds-m-bottom_x-small">
-                        <strong>Default configuration record</strong> with:
-                        <ul class="slds-list_dotted slds-m-left_medium slds-m-top_xx-small">
-                            <li>Workspace slug (from URL)</li>
-                            <li>Repository slug (from URL)</li>
-                            <li>Branch name (usually "main")</li>
-                            <li><strong>Atlassian email</strong> (NOT Bitbucket username!)</li>
-                            <li>API Token</li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
+            <!-- Branches Display -->
+            <template if:true={hasBranches}>
+                <div class="slds-box slds-m-top_medium">
+                    <h3 class="slds-text-heading_small slds-m-bottom_small">Branches:</h3>
+                    <ul class="slds-list_dotted">
+                        <template for:each={branches} for:item="branch">
+                            <li key={branch.name} class="slds-p-around_xx-small">
+                                {branch.name}
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </template>
 
-            <div class="slds-box slds-theme_default slds-m-top_medium" style="border-left: 4px solid #0070d2;">
-                <p class="slds-text-heading_small slds-m-bottom_x-small">
-                    <lightning-icon icon-name="utility:info" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
-                    Finding Your Atlassian Email
-                </p>
-                <p class="slds-text-body_small">
-                    Your Atlassian account email may differ from your Bitbucket username. To find it:
-                </p>
-                <ol class="slds-list_ordered slds-text-body_small slds-m-top_x-small">
-                    <li>Go to <strong>Bitbucket</strong> → <strong>Personal settings</strong></li>
-                    <li>Look under <strong>Email Aliases</strong></li>
-                    <li>Use the primary email address</li>
-                </ol>
-            </div>
+            <!-- Commits Display -->
+            <template if:true={hasCommits}>
+                <div class="slds-box slds-m-top_medium">
+                    <h3 class="slds-text-heading_small slds-m-bottom_small">Recent Commits:</h3>
+                    <ul class="slds-list_dotted">
+                        <template for:each={commits} for:item="commit">
+                            <li key={commit.hash} class="slds-p-around_xx-small">
+                                <strong>{commit.message}</strong> - by {commit.author.raw}
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </template>
 
+            <!-- Pull Requests Display -->
+            <template if:true={hasPullRequests}>
+                <div class="slds-box slds-m-top_medium">
+                    <h3 class="slds-text-heading_small slds-m-bottom_small">Open Pull Requests:</h3>
+                    <ul class="slds-list_dotted">
+                        <template for:each={pullRequests} for:item="pr">
+                            <li key={pr.id} class="slds-p-around_xx-small">
+                                <strong>#{pr.id}</strong> - {pr.title} (State: {pr.state})
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </template>
         </div>
     </lightning-card>
 </template>

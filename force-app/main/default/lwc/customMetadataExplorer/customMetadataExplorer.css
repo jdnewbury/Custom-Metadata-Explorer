@@ -11,17 +11,17 @@
     word-break: break-word;
 }
 
+/* Custom container styling with additional margins and padding */
+.custom-container {
+    margin: 10px 15px;
+    padding: 25px 15px;
+}
+
 /* Ensure data table has proper spacing within the card */
 .slds-card .slds-datatable {
     margin: 0 0 20px 0;
     width: 100%;
     overflow-x: hidden;
-}
-
-/* Custom container styling with additional margins and padding */
-.custom-container {
-    margin: 10px 15px;
-    padding: 25px 15px;
 }
 
 /* Prevent horizontal scrolling in the data table container */

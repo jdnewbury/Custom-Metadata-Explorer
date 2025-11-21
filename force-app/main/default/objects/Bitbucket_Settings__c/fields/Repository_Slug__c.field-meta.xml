@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Repository_Slug__c</fullName>
+    <description>The Bitbucket repository slug (repository name in URL format)</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Enter your Bitbucket repository slug. This is the repository name as it appears in the URL (lowercase, with hyphens instead of spaces).</inlineHelpText>
+    <label>Repository Slug</label>
+    <length>100</length>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
