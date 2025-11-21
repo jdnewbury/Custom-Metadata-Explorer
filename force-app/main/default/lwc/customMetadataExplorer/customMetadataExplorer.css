@@ -1,0 +1,38 @@
+.raw-json {
+    background: #f3f2f2;
+    border: 1px solid #dddbda;
+    margin: 0 15px;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    max-height: 16rem;
+    overflow: auto;
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Ensure data table has proper spacing within the card */
+.slds-card .slds-datatable {
+    margin: 0 0 20px 0;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* Custom container styling with additional margins and padding */
+.custom-container {
+    margin: 10px 15px;
+    padding: 25px 15px;
+}
+
+/* Prevent horizontal scrolling in the data table container */
+.slds-datatable-container {
+}
+
+.slds-col.slds-size_1-of-1.slds-m-top_medium{
+    margin: 30px 0 0 0;
+    overflow-x: none;
+}
+
+.slds-text-title_caps.slds-m-bottom_x-small{
+    margin: 20px 30px 0 30px;
+}

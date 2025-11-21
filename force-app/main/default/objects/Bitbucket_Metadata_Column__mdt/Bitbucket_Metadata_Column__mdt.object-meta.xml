@@ -1,0 +1,6 @@
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Bitbucket Metadata Column</label>
+    <pluralLabel>Bitbucket Metadata Columns</pluralLabel>
+    <description>Defines columns for each Bitbucket Metadata Type. Each record represents one column in the datatable.</description>
+    <visibility>Public</visibility>
+</CustomObject>

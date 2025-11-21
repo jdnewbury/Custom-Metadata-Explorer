@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Is_Collection__c</fullName>
+    <label>Is Collection</label>
+    <description>If true, collects multiple XML elements and joins with separator</description>
+    <type>Checkbox</type>
+    <defaultValue>false</defaultValue>
+</CustomField>

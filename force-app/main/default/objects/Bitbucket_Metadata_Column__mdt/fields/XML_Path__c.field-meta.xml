@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>XML_Path__c</fullName>
+    <label>XML Path</label>
+    <description>Path to extract value from XML. Use dot notation for nested elements (e.g., "fullName", "criteriaItems.field"). Special values: $OBJECT_NAME (from filename), $FILE_PATH</description>
+    <inlineHelpText>XML element to extract. Use $OBJECT_NAME for filename-derived object, $FILE_PATH for full path. Use dot notation for nested elements.</inlineHelpText>
+    <type>Text</type>
+    <length>255</length>
+    <required>false</required>
+</CustomField>

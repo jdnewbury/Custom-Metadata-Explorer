@@ -1,0 +1,68 @@
+<template>
+    <div class="slds-card slds-grid slds-gutters slds-wrap custom-container">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <lightning-combobox
+                name="explorer"
+                label="Custom Metadata"
+                placeholder="Select custom metadata to explore"
+                value={selectedValue}
+                options={options}
+                onchange={handleChange}
+                required
+                data-testid="explorer-combobox"
+            ></lightning-combobox>
+        </div>
+
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3 slds-align-bottom slds-m-top_small">
+            <lightning-button
+                label="Load"
+                variant="brand"
+                title="Load metadata details"
+                onclick={handleLoad}
+                disabled={isLoadDisabled}
+                class="slds-m-left_xx-small"
+                data-testid="load-button"
+            ></lightning-button>
+        </div>
+
+<template if:true={hasData}>
+            <div class="slds-col slds-size_1-of-1 slds-m-top_medium">
+                <lightning-datatable
+                    key-field="Id"
+                    data={dataRows}
+                    columns={columns}
+                    hide-checkbox-column
+                    data-testid="results-datatable"
+                ></lightning-datatable>
+            </div>
+        </template>
+    </div>
+
+    <template if:true={isLoading}>
+        <div class="slds-is-relative slds-p-around_medium">
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </div>
+    </template>
+
+    <template if:true={errorMessage}>
+        <div class="slds-p-around_medium">
+            <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+                <span class="slds-assistive-text">Error</span>
+                <span class="slds-icon_container slds-m-right_small" title="Error">
+                    <lightning-icon icon-name="utility:error" alternative-text="Error" size="x-small"></lightning-icon>
+                </span>
+                <h2>{errorMessage}</h2>
+                <template if:true={error}>
+                    <p>Additional info: {error}</p>
+                </template>
+            </div>
+        </div>
+    </template>
+
+    <template if:true={rawJson}>
+        <section class="slds-p-horizontal_medium slds-p-bottom_medium">
+            <p class="slds-text-title_caps slds-m-bottom_x-small">Response JSON (raw)</p>
+            <pre class="raw-json">{rawJson}</pre>
+        </section>
+    </template>
+</template>

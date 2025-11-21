@@ -1,0 +1,115 @@
+<template>
+    <lightning-card title="Bitbucket Connection Tester" icon-name="custom:custom63">
+        <div class="slds-p-around_medium">
+            
+            <!-- Important Notice -->
+            <div class="slds-box slds-box_x-small slds-theme_warning slds-m-bottom_medium">
+                <div class="slds-grid slds-grid_vertical-align-center">
+                    <lightning-icon icon-name="utility:warning" variant="warning" size="small" class="slds-m-right_small"></lightning-icon>
+                    <div>
+                        <p class="slds-text-body_regular">
+                            <strong>Important:</strong> As of Sept 9, 2025, Bitbucket requires <strong>API Tokens with Scopes</strong>.
+                        </p>
+                        <p class="slds-text-body_small slds-m-top_xx-small">
+                            Use your <strong>Atlassian account email</strong> (not Bitbucket username) for authentication.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="slds-text-body_regular slds-m-bottom_medium">
+                Test your Bitbucket configuration to ensure Salesforce can connect to your repository.
+            </p>
+
+            <lightning-button
+                label="Test Connection"
+                variant="brand"
+                onclick={handleTestConnection}
+                disabled={isLoading}
+                class="slds-m-bottom_medium"
+            ></lightning-button>
+
+            <template if:true={isLoading}>
+                <div class="slds-is-relative slds-m-top_medium" style="height: 50px;">
+                    <lightning-spinner alternative-text="Testing connection..." size="small"></lightning-spinner>
+                </div>
+            </template>
+
+            <template if:true={showResult}>
+                <div class={resultClass}>
+                    <div class="slds-grid slds-grid_vertical-align-start">
+                        <lightning-icon
+                            icon-name={resultIcon}
+                            variant={resultVariant}
+                            size="small"
+                            class="slds-m-right_small"
+                            style="flex-shrink: 0;"
+                        ></lightning-icon>
+                        <div>
+                            <p class="slds-text-heading_small">
+                                <template if:true={testResult.success}>Connection Successful!</template>
+                                <template if:false={testResult.success}>Connection Failed</template>
+                            </p>
+                            <p class="slds-text-body_regular slds-m-top_x-small">{testResult.message}</p>
+                            <template if:true={testResult.repoName}>
+                                <p class="slds-text-body_small slds-m-top_x-small">
+                                    <strong>Repository:</strong> {testResult.repoName}
+                                </p>
+                            </template>
+                            <template if:true={hasAuthMethod}>
+                                <p class="slds-text-body_small slds-m-top_xx-small">
+                                    <strong>Auth Method:</strong> {testResult.authMethod}
+                                </p>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <div class="slds-box slds-theme_shade slds-m-top_large">
+                <p class="slds-text-heading_small slds-m-bottom_small">Setup Checklist</p>
+                <ul class="slds-list_dotted">
+                    <li class="slds-m-bottom_x-small">
+                        <strong>Remote Site Setting</strong> created for <code>https://api.bitbucket.org</code>
+                    </li>
+                    <li class="slds-m-bottom_x-small">
+                        <strong>Bitbucket_Config__mdt</strong> Custom Metadata Type deployed
+                    </li>
+                    <li class="slds-m-bottom_x-small">
+                        <strong>API Token</strong> created with <code>read:repository:bitbucket</code> scope
+                        <ul class="slds-list_dotted slds-m-left_medium slds-m-top_xx-small">
+                            <li>Atlassian account → Security → API tokens</li>
+                            <li>Create API token with scopes → Select Bitbucket</li>
+                        </ul>
+                    </li>
+                    <li class="slds-m-bottom_x-small">
+                        <strong>Default configuration record</strong> with:
+                        <ul class="slds-list_dotted slds-m-left_medium slds-m-top_xx-small">
+                            <li>Workspace slug (from URL)</li>
+                            <li>Repository slug (from URL)</li>
+                            <li>Branch name (usually "main")</li>
+                            <li><strong>Atlassian email</strong> (NOT Bitbucket username!)</li>
+                            <li>API Token</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="slds-box slds-theme_default slds-m-top_medium" style="border-left: 4px solid #0070d2;">
+                <p class="slds-text-heading_small slds-m-bottom_x-small">
+                    <lightning-icon icon-name="utility:info" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                    Finding Your Atlassian Email
+                </p>
+                <p class="slds-text-body_small">
+                    Your Atlassian account email may differ from your Bitbucket username. To find it:
+                </p>
+                <ol class="slds-list_ordered slds-text-body_small slds-m-top_x-small">
+                    <li>Go to <strong>Bitbucket</strong> → <strong>Personal settings</strong></li>
+                    <li>Look under <strong>Email Aliases</strong></li>
+                    <li>Use the primary email address</li>
+                </ol>
+            </div>
+
+        </div>
+    </lightning-card>
+</template>
