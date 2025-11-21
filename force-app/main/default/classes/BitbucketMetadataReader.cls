@@ -85,8 +85,8 @@ public with sharing class BitbucketMetadataReader {
         } catch (BitbucketCredentialHelper.CredentialException ex) {
             throw new AuraHandledException('Bitbucket configuration error: ' + ex.getMessage());
         } catch (Exception ex) {
-            ProjectX_ApexUtils.logError(ex);
-            throw new AuraHandledException('Failed to load metadata: ' + ex.getMessage());
+            //ProjectX_ApexUtils.logError(ex);
+            //throw new AuraHandledException('Failed to load metadata: ' + ex.getMessage());
         }
     }
     
@@ -213,8 +213,8 @@ public with sharing class BitbucketMetadataReader {
             return response;
             
         } catch (Exception ex) {
-            ProjectX_ApexUtils.logError(ex);
-            throw new AuraHandledException('Failed to load file: ' + ex.getMessage());
+            //ProjectX_ApexUtils.logError(ex);
+            //throw new AuraHandledException('Failed to load file: ' + ex.getMessage());
         }
     }
     
@@ -250,8 +250,8 @@ public with sharing class BitbucketMetadataReader {
             return fileInfoList;
             
         } catch (Exception ex) {
-            ProjectX_ApexUtils.logError(ex);
-            throw new AuraHandledException('Failed to list files: ' + ex.getMessage());
+            //ProjectX_ApexUtils.logError(ex);
+            //throw new AuraHandledException('Failed to list files: ' + ex.getMessage());
         }
     }
 }
