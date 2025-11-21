@@ -80,13 +80,18 @@ public with sharing class BitbucketMetadataReader {
             
             return response;
             
-        } catch (MetadataTypeConfig.MetadataConfigException ex) {
+        } catch (MetadataTypeConfig.MetadataConfigException mce) {
+            System.debug('MetadataConfigException: ' + mce.getMessage());
+            System.debug('Stack trace: ' + mce.getStackTraceString());
             throw new AuraHandledException('Unsupported metadata type: ' + metadataTypeKey);
-        } catch (BitbucketCredentialHelper.CredentialException ex) {
-            throw new AuraHandledException('Bitbucket configuration error: ' + ex.getMessage());
+        } catch (BitbucketCredentialHelper.CredentialException bce) {
+            System.debug('CredentialException: ' + bce.getMessage());
+            System.debug('Stack trace: ' + bce.getStackTraceString());
+            throw new AuraHandledException('Bitbucket configuration error: ' + bce.getMessage());
         } catch (Exception ex) {
-            //ProjectX_ApexUtils.logError(ex);
-            //throw new AuraHandledException('Failed to load metadata: ' + ex.getMessage());
+            System.debug('Error in getMetadataByType: ' + ex.getMessage());
+            System.debug('Stack trace: ' + ex.getStackTraceString());
+            throw new AuraHandledException('Failed to load metadata: ' + ex.getMessage());
         }
     }
     
@@ -102,45 +107,55 @@ public with sharing class BitbucketMetadataReader {
     ) {
         List<String> files = new List<String>();
         
-        String endpoint = bbConfig.getDirectoryEndpoint(typeConfig.folderName);
-        
-        HttpRequest req = new HttpRequest();
-        req.setEndpoint(endpoint);
-        req.setMethod('GET');
-        req.setTimeout(60000);
-        
-        // Set auth header if not using Named Credential
-        if (!bbConfig.useNamedCredential) {
-            req.setHeader('Authorization', bbConfig.getAuthorizationHeader());
-        }
-        
-        Http http = new Http();
-        HttpResponse res = http.send(req);
-        
-        if (res.getStatusCode() == 200) {
-            Map<String, Object> result = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
-            List<Object> values = (List<Object>) result.get('values');
+        try {
+            String endpoint = bbConfig.getDirectoryEndpoint(typeConfig.folderName);
             
-            if (values != null) {
-                for (Object val : values) {
-                    Map<String, Object> fileObj = (Map<String, Object>) val;
-                    String path = (String) fileObj.get('path');
-                    
-                    // Filter by file extension
-                    if (path != null && path.endsWith(typeConfig.fileExtension)) {
-                        files.add(path);
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint(endpoint);
+            req.setMethod('GET');
+            req.setTimeout(60000);
+            
+            // Set auth header if not using Named Credential
+            if (!bbConfig.useNamedCredential) {
+                req.setHeader('Authorization', bbConfig.getAuthorizationHeader());
+            }
+            
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+            
+            if (res.getStatusCode() == 200) {
+                Map<String, Object> result = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
+                List<Object> values = (List<Object>) result.get('values');
+                
+                if (values != null) {
+                    for (Object val : values) {
+                        Map<String, Object> fileObj = (Map<String, Object>) val;
+                        String path = (String) fileObj.get('path');
+                        
+                        // Filter by file extension
+                        if (path != null && path.endsWith(typeConfig.fileExtension)) {
+                            files.add(path);
+                        }
                     }
                 }
+            } else if (res.getStatusCode() == 404) {
+                // Folder doesn't exist - return empty list
+                System.debug('Folder not found: ' + typeConfig.folderName);
+            } else if (res.getStatusCode() == 401) {
+                throw new BitbucketCredentialHelper.CredentialException(
+                    'Authentication failed. Please verify your Bitbucket credentials.'
+                );
+            } else {
+                throw new CalloutException('Bitbucket API error (' + res.getStatusCode() + '): ' + res.getStatus());
             }
-        } else if (res.getStatusCode() == 404) {
-            // Folder doesn't exist - return empty list
-            System.debug('Folder not found: ' + typeConfig.folderName);
-        } else if (res.getStatusCode() == 401) {
-            throw new BitbucketCredentialHelper.CredentialException(
-                'Authentication failed. Please verify your Bitbucket credentials.'
-            );
-        } else {
-            throw new CalloutException('Bitbucket API error (' + res.getStatusCode() + '): ' + res.getStatus());
+            
+        } catch (BitbucketCredentialHelper.CredentialException bce) {
+            System.debug('CredentialException in getFilesForType: ' + bce.getMessage());
+            throw bce;
+        } catch (Exception ex) {
+            System.debug('Error in getFilesForType: ' + ex.getMessage());
+            System.debug('Stack trace: ' + ex.getStackTraceString());
+            throw ex;
         }
         
         return files;
@@ -152,30 +167,44 @@ public with sharing class BitbucketMetadataReader {
      * @param bbConfig Bitbucket configuration
      * @return Raw file content as string
      */
-    public static String fetchFileContent(String filePath, BitbucketCredentialHelper.BitbucketConfig bbConfig) {
-        String endpoint = bbConfig.getFileEndpoint(filePath);
-        
-        HttpRequest req = new HttpRequest();
-        req.setEndpoint(endpoint);
-        req.setMethod('GET');
-        req.setTimeout(60000);
-        
-        // Set auth header if not using Named Credential
-        if (!bbConfig.useNamedCredential) {
-            req.setHeader('Authorization', bbConfig.getAuthorizationHeader());
-        }
-        
-        Http http = new Http();
-        HttpResponse res = http.send(req);
-        
-        if (res.getStatusCode() == 200) {
-            return res.getBody();
-        } else if (res.getStatusCode() == 401) {
-            throw new BitbucketCredentialHelper.CredentialException(
-                'Authentication failed. Please verify your Bitbucket credentials.'
-            );
-        } else {
-            throw new CalloutException('Failed to fetch file (' + res.getStatusCode() + '): ' + filePath);
+    public static String fetchFileContent(
+        String filePath, 
+        BitbucketCredentialHelper.BitbucketConfig bbConfig
+    ) {
+        try {
+            String endpoint = bbConfig.getFileEndpoint(filePath);
+            
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint(endpoint);
+            req.setMethod('GET');
+            req.setTimeout(60000);
+            
+            // Set auth header if not using Named Credential
+            if (!bbConfig.useNamedCredential) {
+                req.setHeader('Authorization', bbConfig.getAuthorizationHeader());
+            }
+            
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+            
+            if (res.getStatusCode() == 200) {
+                return res.getBody();
+            } else if (res.getStatusCode() == 401) {
+                throw new BitbucketCredentialHelper.CredentialException(
+                    'Authentication failed. Please verify your Bitbucket credentials.'
+                );
+            } else {
+                throw new CalloutException('Failed to fetch file (' + res.getStatusCode() + '): ' + filePath);
+            }
+            
+        } catch (BitbucketCredentialHelper.CredentialException bce) {
+            System.debug('CredentialException in fetchFileContent: ' + bce.getMessage());
+            throw bce;
+        } catch (Exception ex) {
+            System.debug('Error in fetchFileContent for file: ' + filePath);
+            System.debug('Error message: ' + ex.getMessage());
+            System.debug('Stack trace: ' + ex.getStackTraceString());
+            throw ex;
         }
     }
     
@@ -186,7 +215,10 @@ public with sharing class BitbucketMetadataReader {
      * @return TableResponseDTO for single file
      */
     @AuraEnabled(cacheable=false)
-    public static CustomMetadataExplorerController.TableResponseDTO getFileDetails(String filePath, String metadataTypeKey) {
+    public static CustomMetadataExplorerController.TableResponseDTO getFileDetails(
+        String filePath, 
+        String metadataTypeKey
+    ) {
         try {
             String typeKey = metadataTypeKey.startsWith('bitbucket_') 
                 ? metadataTypeKey.substringAfter('bitbucket_') 
@@ -212,9 +244,18 @@ public with sharing class BitbucketMetadataReader {
             
             return response;
             
+        } catch (MetadataTypeConfig.MetadataConfigException mce) {
+            System.debug('MetadataConfigException in getFileDetails: ' + mce.getMessage());
+            System.debug('Stack trace: ' + mce.getStackTraceString());
+            throw new AuraHandledException('Unsupported metadata type: ' + metadataTypeKey);
+        } catch (BitbucketCredentialHelper.CredentialException bce) {
+            System.debug('CredentialException in getFileDetails: ' + bce.getMessage());
+            System.debug('Stack trace: ' + bce.getStackTraceString());
+            throw new AuraHandledException('Bitbucket configuration error: ' + bce.getMessage());
         } catch (Exception ex) {
-            //ProjectX_ApexUtils.logError(ex);
-            //throw new AuraHandledException('Failed to load file: ' + ex.getMessage());
+            System.debug('Error in getFileDetails: ' + ex.getMessage());
+            System.debug('Stack trace: ' + ex.getStackTraceString());
+            throw new AuraHandledException('Failed to load file: ' + ex.getMessage());
         }
     }
     
@@ -249,9 +290,18 @@ public with sharing class BitbucketMetadataReader {
             
             return fileInfoList;
             
+        } catch (MetadataTypeConfig.MetadataConfigException mce) {
+            System.debug('MetadataConfigException in getFileList: ' + mce.getMessage());
+            System.debug('Stack trace: ' + mce.getStackTraceString());
+            throw new AuraHandledException('Unsupported metadata type: ' + metadataTypeKey);
+        } catch (BitbucketCredentialHelper.CredentialException bce) {
+            System.debug('CredentialException in getFileList: ' + bce.getMessage());
+            System.debug('Stack trace: ' + bce.getStackTraceString());
+            throw new AuraHandledException('Bitbucket configuration error: ' + bce.getMessage());
         } catch (Exception ex) {
-            //ProjectX_ApexUtils.logError(ex);
-            //throw new AuraHandledException('Failed to list files: ' + ex.getMessage());
+            System.debug('Error in getFileList: ' + ex.getMessage());
+            System.debug('Stack trace: ' + ex.getStackTraceString());
+            throw new AuraHandledException('Failed to list files: ' + ex.getMessage());
         }
     }
 }

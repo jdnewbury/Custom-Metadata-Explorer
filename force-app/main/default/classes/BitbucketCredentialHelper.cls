@@ -46,6 +46,11 @@ public with sharing class BitbucketCredentialHelper {
     private static final String CUSTOM_METADATA_RECORD = 'Default';
     
     /**
+     * @description Custom exception for credential errors
+     */
+    public class CredentialException extends Exception {}
+    
+    /**
      * @description Configuration object containing all Bitbucket settings
      */
     public class BitbucketConfig {
@@ -72,7 +77,7 @@ public with sharing class BitbucketCredentialHelper {
             this.branch = 'main';
             this.basePath = 'force-app/main/default';
             this.useNamedCredential = false;
-            this.authType = BitbucketCredentialHelper.AuthType.API_TOKEN;
+            this.authType = AuthType.API_TOKEN;
         }
         
         /**
@@ -159,7 +164,6 @@ public with sharing class BitbucketCredentialHelper {
                 return getConfigFromCustomMetadata();
             }
             when CUSTOM_SETTING {
-                // Removed CUSTOM_SETTING as it's not needed, using CUSTOM_METADATA instead
                 return getConfigFromCustomMetadata();
             }
             when REPOSITORY_TOKEN {
@@ -179,7 +183,6 @@ public with sharing class BitbucketCredentialHelper {
         config.useNamedCredential = true;
         config.namedCredentialName = NAMED_CREDENTIAL_NAME;
         
-        // Get non-sensitive config from Custom Metadata
         try {
             Bitbucket_Config__mdt mdt = Bitbucket_Config__mdt.getInstance(CUSTOM_METADATA_RECORD);
             if (mdt != null) {
@@ -222,7 +225,6 @@ public with sharing class BitbucketCredentialHelper {
             config.branch = String.isNotBlank(mdt.Branch__c) ? mdt.Branch__c : 'main';
             config.basePath = String.isNotBlank(mdt.Base_Path__c) ? mdt.Base_Path__c : 'force-app/main/default';
             
-            // API Token authentication (new method)
             config.email = mdt.Email__c;
             config.apiToken = mdt.API_Token__c;
             
@@ -236,7 +238,6 @@ public with sharing class BitbucketCredentialHelper {
         
         return config;
     }
-    
     
     /**
      * @description Get configuration for Repository Access Token
@@ -261,7 +262,6 @@ public with sharing class BitbucketCredentialHelper {
             config.branch = String.isNotBlank(mdt.Branch__c) ? mdt.Branch__c : 'main';
             config.basePath = String.isNotBlank(mdt.Base_Path__c) ? mdt.Base_Path__c : 'force-app/main/default';
             
-            // Repository Access Token (stored in API_Token__c field)
             config.repositoryAccessToken = mdt.API_Token__c;
             
             validateConfigBasics(config);
@@ -347,7 +347,6 @@ public with sharing class BitbucketCredentialHelper {
                 result.put('message', 'Successfully connected to repository: ' + repoInfo.get('full_name'));
                 result.put('repoName', repoInfo.get('full_name'));
                 
-                // Add auth type info
                 String authInfo = config.authType == AuthType.REPOSITORY_ACCESS_TOKEN 
                     ? 'Repository Access Token' 
                     : 'API Token (email: ' + config.email + ')';
@@ -380,14 +379,5 @@ public with sharing class BitbucketCredentialHelper {
         }
         
         return result;
-    }
-    
-    /**
-     * @description Custom exception for credential errors
-     */
-    public with sharing class CredentialException extends Exception {
-        public CredentialException(String message) {
-            super(message);
-        }
     }
 }
