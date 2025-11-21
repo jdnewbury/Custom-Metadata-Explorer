@@ -27,7 +27,7 @@
         <field>API_Token__c</field>
         <!-- Create at: Atlassian account → Security → API tokens with scopes -->
         <!-- Required scope: read:repository:bitbucket -->
-        <value xsi:type="xsd:string">ATATT3xFfGF0BnTEKPSong9IBC5ZPxAEGpbiApGCRoMNBDiPpNwEx-pnYCZBMr5ADciTZ81Jlmuphsx0fxYSlsN-VGDXFQkixC2L4NRPZUdnQDeUg34Af6gaj1FnRaludAiYFiwiTog81tNWQzH0b36ZgvYVEBKu812CYgzkEt08ioszs2Ve2lk=C8D81317</value>
+        <value xsi:type="xsd:string">secret</value>
     </values>
     <values>
         <field>API_Base_URL__c</field>
