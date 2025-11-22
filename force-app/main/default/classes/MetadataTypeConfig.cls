@@ -82,6 +82,7 @@ public class MetadataTypeConfig {
         config.typeConfig.fileExtension = typeConfig.File_Extension__c;
         config.typeConfig.entryElement = typeConfig.Entry_Element__c;
         config.typeConfig.rootElement = typeConfig.Root_Element__c;
+        config.typeConfig.parserClass = typeConfig.Parser_Class__c;
         config.typeConfig.columns = new List<ColumnConfig>();
         
         for (Bitbucket_Metadata_Column__mdt colMdt : columnMdts) {
@@ -127,6 +128,15 @@ public class MetadataTypeConfig {
     }
     
     /**
+     * Get TypeConfig for parsers (alias for MetadataParserFactory compatibility)
+     * This is what MetadataParserFactory.getParser() calls
+     */
+    public static TypeConfig getConfig(String metadataTypeName) {
+        MetadataTypeConfig fullConfig = loadConfig(metadataTypeName);
+        return fullConfig.typeConfig;
+    }
+    
+    /**
      * Type configuration class for parsers
      * This is what parsers expect to receive
      */
@@ -136,6 +146,7 @@ public class MetadataTypeConfig {
         public String fileExtension { get; set; }
         public String entryElement { get; set; }
         public String rootElement { get; set; }
+        public String parserClass { get; set; }
         public List<ColumnConfig> columns { get; set; }
         
         public TypeConfig() {
