@@ -82,7 +82,7 @@ public class MetadataTypeConfig {
         config.typeConfig.fileExtension = typeConfig.File_Extension__c;
         config.typeConfig.entryElement = typeConfig.Entry_Element__c;
         config.typeConfig.rootElement = typeConfig.Root_Element__c;
-        config.typeConfig.parserClass = typeConfig.Parser_Class__c;
+        config.typeConfig.parserClass = typeConfig.Parser_Class__c; // NEW: Add parserClass
         config.typeConfig.columns = new List<ColumnConfig>();
         
         for (Bitbucket_Metadata_Column__mdt colMdt : columnMdts) {
@@ -146,7 +146,7 @@ public class MetadataTypeConfig {
         public String fileExtension { get; set; }
         public String entryElement { get; set; }
         public String rootElement { get; set; }
-        public String parserClass { get; set; }
+        public String parserClass { get; set; } // NEW: Required by MetadataParserFactory
         public List<ColumnConfig> columns { get; set; }
         
         public TypeConfig() {
