@@ -9,6 +9,7 @@ public class MetadataTypeConfig {
     public String fileExtension { get; set; }
     public String parserClass { get; set; }
     public List<ColumnConfig> columns { get; set; }
+    public TypeConfig typeConfig { get; set; } // NEW: TypeConfig for parsers
     
     /**
      * Column configuration including width percentage
@@ -74,6 +75,15 @@ public class MetadataTypeConfig {
         config.parserClass = typeConfig.Parser_Class__c;
         config.columns = new List<ColumnConfig>();
         
+        // Build TypeConfig for parsers
+        config.typeConfig = new TypeConfig();
+        config.typeConfig.metadataType = typeConfig.DeveloperName;
+        config.typeConfig.folderName = typeConfig.Folder_Name__c;
+        config.typeConfig.fileExtension = typeConfig.File_Extension__c;
+        config.typeConfig.entryElement = typeConfig.Entry_Element__c;
+        config.typeConfig.rootElement = typeConfig.Root_Element__c;
+        config.typeConfig.columns = new List<ColumnConfig>();
+        
         for (Bitbucket_Metadata_Column__mdt colMdt : columnMdts) {
             ColumnConfig col = new ColumnConfig();
             col.fieldName = colMdt.Field_Name__c;
@@ -87,6 +97,7 @@ public class MetadataTypeConfig {
             col.widthPercent = colMdt.Column_Width__c; // NEW: Get width percentage
             
             config.columns.add(col);
+            config.typeConfig.columns.add(col); // Also add to typeConfig for parsers
         }
         
         return config;
@@ -113,6 +124,23 @@ public class MetadataTypeConfig {
         }
         
         return options;
+    }
+    
+    /**
+     * Type configuration class for parsers
+     * This is what parsers expect to receive
+     */
+    public class TypeConfig {
+        public String metadataType { get; set; }
+        public String folderName { get; set; }
+        public String fileExtension { get; set; }
+        public String entryElement { get; set; }
+        public String rootElement { get; set; }
+        public List<ColumnConfig> columns { get; set; }
+        
+        public TypeConfig() {
+            this.columns = new List<ColumnConfig>();
+        }
     }
     
     public class MetadataException extends Exception {}

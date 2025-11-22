@@ -42,7 +42,8 @@ public with sharing class BitbucketMetadataController {
             for (String filePath : files) {
                 String xmlContent = getFileContent(filePath);
                 if (String.isNotBlank(xmlContent)) {
-                    List<Map<String, Object>> parsedData = parser.parse(xmlContent, config);
+                    // Parse using the actual parser interface signature: parse(xmlContent, filePath, config)
+                    List<Map<String, Object>> parsedData = parser.parse(xmlContent, filePath, config.typeConfig);
                     if (parsedData != null && !parsedData.isEmpty()) {
                         allData.addAll(parsedData);
                         jsonParts.add(JSON.serializePretty(parsedData));
@@ -82,7 +83,10 @@ public with sharing class BitbucketMetadataController {
             HttpRequest req = new HttpRequest();
             req.setEndpoint(apiUrl);
             req.setMethod('GET');
-            req.setHeader('Authorization', BitbucketCredentialHelper.getAuthHeader());
+            
+            // Get auth header - try different approaches
+            String authHeader = getAuthorizationHeader();
+            req.setHeader('Authorization', authHeader);
             req.setTimeout(60000);
             
             Http http = new Http();
@@ -129,7 +133,10 @@ public with sharing class BitbucketMetadataController {
             HttpRequest req = new HttpRequest();
             req.setEndpoint(rawUrl);
             req.setMethod('GET');
-            req.setHeader('Authorization', BitbucketCredentialHelper.getAuthHeader());
+            
+            // Get auth header
+            String authHeader = getAuthorizationHeader();
+            req.setHeader('Authorization', authHeader);
             req.setTimeout(60000);
             
             Http http = new Http();
@@ -227,6 +234,32 @@ public with sharing class BitbucketMetadataController {
         @AuraEnabled public String type { get; set; }
         @AuraEnabled public Boolean sortable { get; set; }
         @AuraEnabled public Decimal widthPercent { get; set; }
+    }
+    
+    /**
+     * Get authorization header for Bitbucket API
+     * Builds Basic Auth header from config
+     */
+    private static String getAuthorizationHeader() {
+        try {
+            // Get credentials from config
+            Bitbucket_Config__mdt config = [
+                SELECT Email__c, API_Token__c
+                FROM Bitbucket_Config__mdt
+                WHERE DeveloperName = 'Default'
+                LIMIT 1
+            ];
+            
+            // Build Basic Auth header
+            String credentials = config.Email__c + ':' + config.API_Token__c;
+            Blob credentialsBlob = Blob.valueOf(credentials);
+            String encodedCredentials = EncodingUtil.base64Encode(credentialsBlob);
+            
+            return 'Basic ' + encodedCredentials;
+            
+        } catch (Exception e) {
+            throw new ConfigException('Error getting Bitbucket credentials: ' + e.getMessage());
+        }
     }
     
     public class ConfigException extends Exception {}
