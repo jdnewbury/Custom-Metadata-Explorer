@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Repository__c</field>
-        <value xsi:type="xsd:string">your-repository-slug</value>
+        <value xsi:type="xsd:string">agentforcedevorg</value>
     </values>
     <values>
         <field>Token_Expiry__c</field>
@@ -32,6 +32,6 @@
     </values>
     <values>
         <field>Workspace__c</field>
-        <value xsi:type="xsd:string">your-workspace-slug</value>
+        <value xsi:type="xsd:string">jason-newbury</value>
     </values>
 </CustomMetadata>
