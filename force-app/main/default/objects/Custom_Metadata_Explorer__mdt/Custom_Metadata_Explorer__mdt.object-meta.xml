@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>We&apos;ll use this to store details about the types of custom metadata that is available for exploration</description>
-    <label>Custom Metadata Explorer</label>
-    <pluralLabel>Custom Metadata Explorer</pluralLabel>
-    <visibility>Public</visibility>
-</CustomObject>
