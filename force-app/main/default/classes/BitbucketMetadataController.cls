@@ -1,6 +1,6 @@
 /**
  * Controller for customMetadataExplorer LWC
- * Provides metadata type options and retrieves metadata using BitbucketMetadataReader
+ * Self-contained solution for retrieving metadata from Bitbucket with column width support
  */
 public with sharing class BitbucketMetadataController {
     
@@ -27,39 +27,143 @@ public with sharing class BitbucketMetadataController {
             // Load configuration including column widths
             MetadataTypeConfig config = MetadataTypeConfig.loadConfig(metadataType);
             
-            // Get metadata from Bitbucket using existing reader
-            Map<String, Object> readerResponse = BitbucketMetadataReader.getMetadataByType(metadataType);
+            // Get parser instance
+            IMetadataParser parser = MetadataParserFactory.getParser(
+                config.parserClass != null ? config.parserClass : 'GenericMetadataParser'
+            );
             
-            // Check for errors in response
-            Boolean success = (Boolean) readerResponse.get('success');
-            if (success == false) {
-                String errorMsg = (String) readerResponse.get('error');
-                throw new AuraHandledException(errorMsg != null ? errorMsg : 'Unknown error from metadata reader');
+            // Get files from Bitbucket
+            List<String> files = getMetadataFiles(config.folderName, config.fileExtension);
+            
+            // Parse all files
+            List<Map<String, Object>> allData = new List<Map<String, Object>>();
+            List<String> jsonParts = new List<String>();
+            
+            for (String filePath : files) {
+                String xmlContent = getFileContent(filePath);
+                if (String.isNotBlank(xmlContent)) {
+                    List<Map<String, Object>> parsedData = parser.parse(xmlContent, config);
+                    if (parsedData != null && !parsedData.isEmpty()) {
+                        allData.addAll(parsedData);
+                        jsonParts.add(JSON.serializePretty(parsedData));
+                    }
+                }
             }
             
-            // Build response with width-aware columns
+            // Build response
             MetadataResponse response = new MetadataResponse();
             response.columns = buildColumns(config.columns);
-            
-            // Extract data from reader response
-            Object dataObj = readerResponse.get('data');
-            if (dataObj instanceof List<Object>) {
-                response.data = (List<Map<String, Object>>) dataObj;
-            } else {
-                response.data = new List<Map<String, Object>>();
-            }
-            
-            // Get raw JSON if available
-            String rawJson = (String) readerResponse.get('rawJson');
-            response.rawJson = rawJson != null ? rawJson : '';
-            
+            response.data = allData;
+            response.rawJson = '[' + String.join(jsonParts, ',\n') + ']';
             response.totalWidth = calculateTotalWidth(config.columns);
             
             return response;
             
         } catch (Exception e) {
+            System.debug('Error in getMetadataDetails: ' + e.getMessage());
+            System.debug('Stack trace: ' + e.getStackTraceString());
             throw new AuraHandledException('Error retrieving metadata: ' + e.getMessage());
         }
+    }
+    
+    /**
+     * Get list of metadata files from Bitbucket repository
+     */
+    private static List<String> getMetadataFiles(String folderName, String fileExtension) {
+        List<String> filePaths = new List<String>();
+        
+        try {
+            Bitbucket_Config__mdt config = getBitbucketConfig();
+            
+            String apiUrl = 'https://api.bitbucket.org/2.0/repositories/' 
+                + config.Workspace__c + '/' + config.Repository__c 
+                + '/src/' + config.Branch__c + '/' + config.Base_Path__c + '/' + folderName;
+            
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint(apiUrl);
+            req.setMethod('GET');
+            req.setHeader('Authorization', BitbucketCredentialHelper.getAuthHeader());
+            req.setTimeout(60000);
+            
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+            
+            if (res.getStatusCode() == 200) {
+                Map<String, Object> result = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
+                List<Object> values = (List<Object>) result.get('values');
+                
+                if (values != null) {
+                    for (Object item : values) {
+                        Map<String, Object> file = (Map<String, Object>) item;
+                        String path = (String) file.get('path');
+                        String type = (String) file.get('type');
+                        
+                        if (type == 'commit_file' && path != null && path.endsWith(fileExtension)) {
+                            filePaths.add(path);
+                        }
+                    }
+                }
+            } else {
+                System.debug('Bitbucket API error: ' + res.getStatusCode() + ' - ' + res.getBody());
+            }
+            
+        } catch (Exception e) {
+            System.debug('Error getting metadata files: ' + e.getMessage());
+            throw e;
+        }
+        
+        return filePaths;
+    }
+    
+    /**
+     * Get file content from Bitbucket
+     */
+    private static String getFileContent(String filePath) {
+        try {
+            Bitbucket_Config__mdt config = getBitbucketConfig();
+            
+            String rawUrl = 'https://api.bitbucket.org/2.0/repositories/' 
+                + config.Workspace__c + '/' + config.Repository__c 
+                + '/src/' + config.Branch__c + '/' + filePath;
+            
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint(rawUrl);
+            req.setMethod('GET');
+            req.setHeader('Authorization', BitbucketCredentialHelper.getAuthHeader());
+            req.setTimeout(60000);
+            
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+            
+            if (res.getStatusCode() == 200) {
+                return res.getBody();
+            } else {
+                System.debug('Error fetching file ' + filePath + ': ' + res.getStatusCode());
+            }
+            
+        } catch (Exception e) {
+            System.debug('Error getting file content for ' + filePath + ': ' + e.getMessage());
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Get Bitbucket configuration
+     */
+    private static Bitbucket_Config__mdt getBitbucketConfig() {
+        List<Bitbucket_Config__mdt> configs = [
+            SELECT Workspace__c, Repository__c, Branch__c, Base_Path__c
+            FROM Bitbucket_Config__mdt
+            WHERE DeveloperName = 'Default'
+            LIMIT 1
+        ];
+        
+        if (configs.isEmpty()) {
+            throw new ConfigException('No Bitbucket configuration found. Please create a Bitbucket_Config__mdt record.');
+        }
+        
+        return configs[0];
     }
     
     /**
@@ -85,16 +189,14 @@ public with sharing class BitbucketMetadataController {
     }
     
     /**
-     * Calculate total width percentage specified (for validation/auto-sizing)
+     * Calculate total width percentage
      */
     private static Decimal calculateTotalWidth(List<MetadataTypeConfig.ColumnConfig> columns) {
         Decimal total = 0;
-        Integer columnsWithWidth = 0;
         
         for (MetadataTypeConfig.ColumnConfig col : columns) {
             if (col.active && col.widthPercent != null) {
                 total += col.widthPercent;
-                columnsWithWidth++;
             }
         }
         
@@ -124,6 +226,8 @@ public with sharing class BitbucketMetadataController {
         @AuraEnabled public String label { get; set; }
         @AuraEnabled public String type { get; set; }
         @AuraEnabled public Boolean sortable { get; set; }
-        @AuraEnabled public Decimal widthPercent { get; set; } // Percentage of total width
+        @AuraEnabled public Decimal widthPercent { get; set; }
     }
+    
+    public class ConfigException extends Exception {}
 }

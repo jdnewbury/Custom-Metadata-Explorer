@@ -12,7 +12,7 @@ export default class CustomMetadataExplorer extends LightningElement {
     @track errorMessage = '';
     @track rawJson = '';
     @track containerWidth = 0;
-
+    
     // Store original column definitions with width percentages
     originalColumns = [];
     resizeObserver;
@@ -27,7 +27,7 @@ export default class CustomMetadataExplorer extends LightningElement {
                 value: option.value
             }));
             console.log('Options set successfully');
-
+            
             // Setup resize observer after component mounts
             this.setupResizeObserver();
         } catch (error) {
@@ -53,7 +53,7 @@ export default class CustomMetadataExplorer extends LightningElement {
             const container = this.template.querySelector('.custom-container');
             if (container) {
                 this.containerWidth = container.offsetWidth;
-
+                
                 // Create resize observer
                 this.resizeObserver = new ResizeObserver(entries => {
                     for (let entry of entries) {
@@ -64,7 +64,7 @@ export default class CustomMetadataExplorer extends LightningElement {
                         }
                     }
                 });
-
+                
                 this.resizeObserver.observe(container);
             }
         }, 100);
@@ -97,10 +97,10 @@ export default class CustomMetadataExplorer extends LightningElement {
 
             // Store original columns with width percentages
             this.originalColumns = response.columns || [];
-
+            
             // Build datatable columns with calculated pixel widths
             this.columns = this.buildDatatableColumns(response.columns || []);
-
+            
             // Ensure each row has a stable Id for key-field
             const rows = Array.isArray(response.data) ? response.data : [];
             this.dataRows = rows.map((r, idx) => {
@@ -131,18 +131,18 @@ export default class CustomMetadataExplorer extends LightningElement {
 
         // Get current container width, default to 1000px if not yet measured
         const containerWidth = this.containerWidth || 1000;
-
+        
         // Account for padding/margins (approximately 30px on each side)
         const availableWidth = containerWidth - 60;
-
+        
         // Separate columns with and without explicit width
         const columnsWithWidth = columns.filter(col => col.widthPercent != null);
         const columnsWithoutWidth = columns.filter(col => col.widthPercent == null);
-
+        
         // Calculate width used by explicit percentages
         const totalExplicitPercent = columnsWithWidth.reduce((sum, col) => 
             sum + (col.widthPercent || 0), 0);
-
+        
         // Remaining percentage for auto-sized columns
         const remainingPercent = Math.max(0, 100 - totalExplicitPercent);
         const autoWidthPercent = columnsWithoutWidth.length > 0 
@@ -153,7 +153,7 @@ export default class CustomMetadataExplorer extends LightningElement {
         return columns.map(col => {
             const percent = col.widthPercent != null ? col.widthPercent : autoWidthPercent;
             const pixelWidth = Math.floor((percent / 100) * availableWidth);
-
+            
             return {
                 label: col.label,
                 fieldName: col.fieldName,
