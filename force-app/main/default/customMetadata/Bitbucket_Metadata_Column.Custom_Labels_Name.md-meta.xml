@@ -19,6 +19,10 @@
         <value xsi:type="xsd:string">text</value>
     </values>
     <values>
+        <field>Column_Width__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
         <field>Field_Name__c</field>
         <value xsi:type="xsd:string">fullName</value>
     </values>

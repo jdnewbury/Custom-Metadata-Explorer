@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All_Fields</fullName>
+    <columns>MasterLabel</columns>
+    <columns>DeveloperName</columns>
+    <columns>NamespacePrefix</columns>
+    <columns>IsProtected</columns>
+    <columns>API_Base_URL__c</columns>
+    <columns>API_Token__c</columns>
+    <columns>Base_Path__c</columns>
+    <columns>Branch__c</columns>
+    <columns>Email__c</columns>
+    <columns>Repository__c</columns>
+    <columns>Token_Expiry__c</columns>
+    <columns>Workspace__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>All Fields</label>
+    <language>en_US</language>
+</ListView>
