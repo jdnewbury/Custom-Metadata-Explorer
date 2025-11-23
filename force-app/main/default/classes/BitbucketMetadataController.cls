@@ -262,5 +262,52 @@ public with sharing class BitbucketMetadataController {
         }
     }
     
+    /**
+     * Test Bitbucket connection by listing assignmentRules folder
+     * @return Success message or error details
+     */
+    @AuraEnabled
+    public static String testConnection() {
+        try {
+            Bitbucket_Config__mdt config = getBitbucketConfig();
+            
+            String testUrl = 'https://api.bitbucket.org/2.0/repositories/' 
+                + config.Workspace__c + '/' + config.Repository__c 
+                + '/src/' + config.Branch__c + '/' + config.Base_Path__c + '/assignmentRules';
+            
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint(testUrl);
+            req.setMethod('GET');
+            req.setHeader('Authorization', getAuthorizationHeader());
+            req.setTimeout(30000);
+            
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+            
+            if (res.getStatusCode() == 200) {
+                Map<String, Object> result = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
+                List<Object> values = (List<Object>) result.get('values');
+                Integer fileCount = values != null ? values.size() : 0;
+                
+                return 'SUCCESS: Connected to Bitbucket! Found ' + fileCount + ' files in assignmentRules folder.\n' +
+                       'Workspace: ' + config.Workspace__c + '\n' +
+                       'Repository: ' + config.Repository__c + '\n' +
+                       'Branch: ' + config.Branch__c;
+            } else if (res.getStatusCode() == 401) {
+                return 'ERROR: Authentication failed. Check Email and API_Token in Bitbucket_Config__mdt.\n' +
+                       'Status: ' + res.getStatusCode();
+            } else if (res.getStatusCode() == 404) {
+                return 'ERROR: Repository or folder not found. Check Workspace, Repository, Branch, Base_Path.\n' +
+                       'URL: ' + testUrl + '\n' +
+                       'Status: ' + res.getStatusCode();
+            } else {
+                return 'ERROR: Status ' + res.getStatusCode() + ': ' + res.getStatus();
+            }
+            
+        } catch (Exception e) {
+            return 'ERROR: ' + e.getMessage() + ' (Line ' + e.getLineNumber() + ')';
+        }
+    }
+    
     public class ConfigException extends Exception {}
 }
