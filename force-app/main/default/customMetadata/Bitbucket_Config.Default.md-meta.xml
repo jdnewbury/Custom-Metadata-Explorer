@@ -8,7 +8,7 @@
     </values>
     <values>
         <field>API_Token__c</field>
-        <value xsi:type="xsd:string">ATATT3xFfGF0BnTEKPSong9IBC5ZPxAEGpbiApGCRoMNBDiPpNwEx-pnYCZBMr5ADciTZ81Jlmuphsx0fxYSlsN-VGDXFQkixC2L4NRPZUdnQDeUg34Af6gaj1FnRaludAiYFiwiTog81tNWQzH0b36ZgvYVEBKu812CYgzkEt08ioszs2Ve2lk=C8D81317</value>
+        <value xsi:type="xsd:string">ATCTT3xFfGN0pGqTwjySkTKVDVCA0Lm9y1UWro71FI6xjwrChGFckAGO3xGtEyidHBjZ6welDHQJF3B4RlBpdS3lhuIz1VdwOEHytPfGR_RZFL5BLo4WU7NItJ_JhFlk1j9rBny25kfNHExiOdd9x4L3jdxWv4ZpyDnjTr6fxfHfPMfCkoWSzOY=C9CE900F</value>
     </values>
     <values>
         <field>Base_Path__c</field>
@@ -20,7 +20,7 @@
     </values>
     <values>
         <field>Email__c</field>
-        <value xsi:type="xsd:string">jason.newbury@tquilaanz.com</value>
+        <value xsi:type="xsd:string">g7hqygj6d7udwyqxq08e6mrarc1zdj@bots.bitbucket.org</value>
     </values>
     <values>
         <field>Repository__c</field>
@@ -28,7 +28,7 @@
     </values>
     <values>
         <field>Token_Expiry__c</field>
-        <value xsi:type="xsd:date">2026-01-01</value>
+        <value xsi:type="xsd:date">2026-11-23</value>
     </values>
     <values>
         <field>Workspace__c</field>
