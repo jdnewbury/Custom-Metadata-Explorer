@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Permission Sets</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Display_Name__c</field>
+        <value xsi:type="xsd:string">Permission Sets</value>
+    </values>
+    <values>
+        <field>Entry_Element__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>File_Extension__c</field>
+        <value xsi:type="xsd:string">.permissionset-meta.xml</value>
+    </values>
+    <values>
+        <field>Folder_Name__c</field>
+        <value xsi:type="xsd:string">permissionsets</value>
+    </values>
+    <values>
+        <field>Parser_Class__c</field>
+        <value xsi:type="xsd:string">PermissionSetsParser</value>
+    </values>
+    <values>
+        <field>Root_Element__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Sort_Order__c</field>
+        <value xsi:type="xsd:double">55.0</value>
+    </values>
+</CustomMetadata>
